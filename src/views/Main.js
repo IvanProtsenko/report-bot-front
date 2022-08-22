@@ -165,16 +165,16 @@ export default class Main extends Component {
     return (
       <div>
         <Row>
-          <Col xs={2}>
-            <div className="charts">
+          <Col className="charts" xs={2}>
+            <div className="chart">
               <PieChart stats={this.state.stats} />
               Times
             </div>
-            <div className="charts">
+            <div className="chart">
               <PieChart stats={this.state.statsHappiness} />
               avg Happiness
             </div>
-            <div className="charts">
+            <div className="chart">
               <PieChart stats={this.state.statsFocus} />
               avg Focus
             </div>

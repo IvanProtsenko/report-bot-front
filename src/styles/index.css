@@ -11,5 +11,9 @@
 }
 
 .charts {
+  margin-left: 30px;
+}
+
+.chart {
   width: 90%;
 }
