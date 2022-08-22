@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 export default class Login extends Component {
   state = {
     id: '',
+    userId: '',
   };
 
   constructor(props) {
@@ -32,7 +33,12 @@ export default class Login extends Component {
     }
   }
 
-  async componentDidMount() {}
+  async toMain() {}
+
+  async componentDidMount() {
+    const userId = localStorage.getItem('userId');
+    if (userId) window.location.href = '/main';
+  }
 
   render() {
     return (
