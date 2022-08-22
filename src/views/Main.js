@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { data, PieChart } from './PieChart';
+import Table from './Table';
 
 export default class Main extends Component {
   allReports = [];
@@ -165,6 +166,20 @@ export default class Main extends Component {
       <div>
         <Row>
           <Col xs={2}>
+            <div className="charts">
+              <PieChart stats={this.state.stats} />
+              Times
+            </div>
+            <div className="charts">
+              <PieChart stats={this.state.statsHappiness} />
+              avg Happiness
+            </div>
+            <div className="charts">
+              <PieChart stats={this.state.statsFocus} />
+              avg Focus
+            </div>
+          </Col>
+          <Col xs={9}>
             <div>
               <Button
                 className="modalButton"
@@ -176,35 +191,7 @@ export default class Main extends Component {
                 Settings
               </Button>
             </div>
-            <div>Reports:</div>
-            {this.state.reports.forEach((report) => {
-              this.allReports.push(
-                <Card style={{ width: '18rem' }}>
-                  <Card.Body>
-                    <Card.Title>{report.time}</Card.Title>
-                    <Card.Text>
-                      <div>Task type: {report.taskType}</div>
-                      <div>Happiness: {report.happiness}</div>
-                      <div>Focus: {report.focus}</div>
-                      <div>Note: {report.note}</div>
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              );
-            })}
-            {this.allReports}
-          </Col>
-          <Col>
-            <PieChart stats={this.state.stats} />
-            Times
-          </Col>
-          <Col>
-            <PieChart stats={this.state.statsHappiness} />
-            avg Happiness
-          </Col>
-          <Col>
-            <PieChart stats={this.state.statsFocus} />
-            avg Focus
+            <Table />
           </Col>
         </Row>
       </div>
