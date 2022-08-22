@@ -47,6 +47,55 @@ export default class Settings extends Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
+  async updateValues(settings) {
+    console.log(settings.botActivated);
+    this.setState(() => {
+      return { botEnabled: settings.botActivated };
+    });
+    this.setState(() => {
+      return { mondayFrom: settings.mondayFrom };
+    });
+    this.setState(() => {
+      return { mondayTo: settings.mondayTill };
+    });
+    this.setState(() => {
+      return { tuesdayFrom: settings.tuesdayFrom };
+    });
+    this.setState(() => {
+      return { tuesdayTo: settings.tuesdayTill };
+    });
+    this.setState(() => {
+      return { wednesdayFrom: settings.wednesdayFrom };
+    });
+    this.setState(() => {
+      return { wednesdayTo: settings.wednesdayTill };
+    });
+    this.setState(() => {
+      return { thursdayFrom: settings.thursdayFrom };
+    });
+    this.setState(() => {
+      return { thursdayTo: settings.thursdayTill };
+    });
+    this.setState(() => {
+      return { fridayFrom: settings.fridayFrom };
+    });
+    this.setState(() => {
+      return { fridayTo: settings.fridayTill };
+    });
+    this.setState(() => {
+      return { saturdayFrom: settings.saturdayFrom };
+    });
+    this.setState(() => {
+      return { saturdayTo: settings.saturdayTill };
+    });
+    this.setState(() => {
+      return { sundayFrom: settings.sundayFrom };
+    });
+    this.setState(() => {
+      return { sundayTo: settings.sundayTill };
+    });
+  }
+
   async componentDidMount() {
     const userId = localStorage.getItem('userId');
     if (!userId) window.location.href = '/';
@@ -55,6 +104,9 @@ export default class Settings extends Component {
       return { settings };
     });
     console.log(settings);
+    if (settings.length > 0) {
+      await this.updateValues(settings[0]);
+    }
     this.setState(() => {
       return { settingsRendered: true };
     });
@@ -171,11 +223,13 @@ export default class Settings extends Component {
       wednesdayTill: this.state.wednesdayTo,
     };
     console.log(data);
-    // if (this.state.settings) {
-    //   apiService.updateUserSettings(data);
-    // } else {
-    //   apiService.createUserSettings(data);
-    // }
+    if (this.state.settings.length > 0) {
+      console.log('settings exist');
+      apiService.updateSettings(data);
+    } else {
+      console.log('settings does not exist');
+      apiService.createSettings(data);
+    }
   }
 
   renderReports() {
@@ -197,7 +251,7 @@ export default class Settings extends Component {
             <Form.Check
               type="checkbox"
               onClick={this.handleInputBotEnabled}
-              value={this.state.botEnabled}
+              checked={this.state.botEnabled}
               label="Enable bot notifications"
             />
           </Form.Group>

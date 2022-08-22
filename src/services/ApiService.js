@@ -14,6 +14,20 @@ const GET_SCHEDULE_BY_ID = gql`
     Settings(where: { ownerId: { _eq: $id } }) {
       ownerId
       botActivated
+      fridayFrom
+      fridayTill
+      mondayFrom
+      mondayTill
+      saturdayFrom
+      saturdayTill
+      sundayFrom
+      sundayTill
+      thursdayFrom
+      thursdayTill
+      tuesdayFrom
+      tuesdayTill
+      wednesdayFrom
+      wednesdayTill
     }
   }
 `;
@@ -32,25 +46,42 @@ const GET_REPORTS_BY_USER_ID = gql`
 `;
 
 const CREATE_SETTINGS = gql`
-  mutation CreateSettings {
+  mutation CreateSettings(
+    $botActivated: Boolean
+    $ownerId: String
+    $mondayFrom: smallint
+    $mondayTill: smallint
+    $tuesdayFrom: smallint
+    $tuesdayTill: smallint
+    $wednesdayFrom: smallint
+    $wednesdayTill: smallint
+    $thursdayFrom: smallint
+    $thursdayTill: smallint
+    $fridayFrom: smallint
+    $fridayTill: smallint
+    $saturdayFrom: smallint
+    $saturdayTill: smallint
+    $sundayFrom: smallint
+    $sundayTill: smallint
+  ) {
     insert_Settings_one(
       object: {
-        botActivated: false
-        fridayFrom: ""
-        fridayTill: ""
-        mondayFrom: ""
-        mondayTill: ""
-        ownerId: ""
-        saturdayFrom: ""
-        saturdayTill: ""
-        sundayFrom: ""
-        sundayTill: ""
-        thursdayFrom: ""
-        thursdayTill: ""
-        tuesdayFrom: ""
-        tuesdayTill: ""
-        wednesdayFrom: ""
-        wednesdayTill: ""
+        botActivated: $botActivated
+        fridayFrom: $fridayFrom
+        fridayTill: $fridayTill
+        mondayFrom: $mondayFrom
+        mondayTill: $mondayTill
+        ownerId: $ownerId
+        saturdayFrom: $saturdayFrom
+        saturdayTill: $saturdayTill
+        sundayFrom: $sundayFrom
+        sundayTill: $sundayTill
+        thursdayFrom: $thursdayFrom
+        thursdayTill: $thursdayTill
+        tuesdayFrom: $tuesdayFrom
+        tuesdayTill: $tuesdayTill
+        wednesdayFrom: $wednesdayFrom
+        wednesdayTill: $wednesdayTill
       }
     ) {
       botActivated
@@ -69,6 +100,67 @@ const CREATE_SETTINGS = gql`
       tuesdayFrom
       wednesdayFrom
       wednesdayTill
+    }
+  }
+`;
+
+const UPDATE_SETTINGS = gql`
+  mutation UpdateSettings(
+    $botActivated: Boolean
+    $ownerId: String
+    $mondayFrom: smallint
+    $mondayTill: smallint
+    $tuesdayFrom: smallint
+    $tuesdayTill: smallint
+    $wednesdayFrom: smallint
+    $wednesdayTill: smallint
+    $thursdayFrom: smallint
+    $thursdayTill: smallint
+    $fridayFrom: smallint
+    $fridayTill: smallint
+    $saturdayFrom: smallint
+    $saturdayTill: smallint
+    $sundayFrom: smallint
+    $sundayTill: smallint
+  ) {
+    update_Settings(
+      where: { ownerId: { _eq: $ownerId } }
+      _set: {
+        botActivated: $botActivated
+        fridayFrom: $fridayFrom
+        fridayTill: $fridayTill
+        mondayFrom: $mondayFrom
+        mondayTill: $mondayTill
+        saturdayFrom: $saturdayFrom
+        saturdayTill: $saturdayTill
+        sundayFrom: $sundayFrom
+        sundayTill: $sundayTill
+        thursdayFrom: $thursdayFrom
+        thursdayTill: $thursdayTill
+        tuesdayFrom: $tuesdayFrom
+        tuesdayTill: $tuesdayTill
+        wednesdayFrom: $wednesdayFrom
+        wednesdayTill: $wednesdayTill
+      }
+    ) {
+      returning {
+        botActivated
+        fridayFrom
+        fridayTill
+        mondayFrom
+        mondayTill
+        ownerId
+        saturdayFrom
+        saturdayTill
+        sundayFrom
+        sundayTill
+        thursdayFrom
+        thursdayTill
+        tuesdayFrom
+        tuesdayTill
+        wednesdayFrom
+        wednesdayTill
+      }
     }
   }
 `;
@@ -166,6 +258,66 @@ class ApiService {
         },
       });
       return result.data.Report;
+    } catch (err) {
+      console.log('ERROR:', err);
+    }
+  };
+
+  createSettings = async (data) => {
+    try {
+      const result = await this.client.mutate({
+        mutation: CREATE_SETTINGS,
+        variables: {
+          botActivated: data.botActivated,
+          ownerId: data.ownerId,
+          mondayFrom: data.mondayFrom,
+          mondayTill: data.mondayTill,
+          tuesdayFrom: data.tuesdayFrom,
+          tuesdayTill: data.tuesdayTill,
+          wednesdayFrom: data.wednesdayFrom,
+          wednesdayTill: data.wednesdayTill,
+          thursdayFrom: data.thursdayFrom,
+          thursdayTill: data.thursdayTill,
+          fridayFrom: data.fridayFrom,
+          fridayTill: data.fridayTill,
+          saturdayFrom: data.saturdayFrom,
+          saturdayTill: data.saturdayTill,
+          sundayFrom: data.sundayFrom,
+          sundayTill: data.sundayTill,
+        },
+      });
+      console.log(result);
+      return result.data.insert_Settings_one;
+    } catch (err) {
+      console.log('ERROR:', err);
+    }
+  };
+
+  updateSettings = async (data) => {
+    try {
+      const result = await this.client.mutate({
+        mutation: UPDATE_SETTINGS,
+        variables: {
+          botActivated: data.botActivated,
+          ownerId: data.ownerId,
+          mondayFrom: data.mondayFrom,
+          mondayTill: data.mondayTill,
+          tuesdayFrom: data.tuesdayFrom,
+          tuesdayTill: data.tuesdayTill,
+          wednesdayFrom: data.wednesdayFrom,
+          wednesdayTill: data.wednesdayTill,
+          thursdayFrom: data.thursdayFrom,
+          thursdayTill: data.thursdayTill,
+          fridayFrom: data.fridayFrom,
+          fridayTill: data.fridayTill,
+          saturdayFrom: data.saturdayFrom,
+          saturdayTill: data.saturdayTill,
+          sundayFrom: data.sundayFrom,
+          sundayTill: data.sundayTill,
+        },
+      });
+      console.log(result);
+      return result.data.update_Settings;
     } catch (err) {
       console.log('ERROR:', err);
     }
