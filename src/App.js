@@ -3,6 +3,8 @@ import { Routes, Switch } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 import { Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
 import Login from './views/Login';
 import Main from './views/Main';
 import Settings from './views/Settings';

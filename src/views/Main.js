@@ -1,10 +1,10 @@
 import React, { Component, useRef } from 'react';
 import { apiService } from '../services/ApiService';
-import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { data, PieChart } from './PieChart';
+import { DateRangePicker } from 'react-date-range';
 import Table from './Table';
 
 export default class Main extends Component {
@@ -19,10 +19,16 @@ export default class Main extends Component {
     stats: {},
     statsHappiness: {},
     statsFocus: {},
+    selectionRange: {
+      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+      key: 'selection',
+    },
   };
 
   constructor(props) {
     super(props);
+    this.handleSelect = this.handleSelect.bind(this);
   }
 
   async componentDidMount() {
@@ -161,6 +167,19 @@ export default class Main extends Component {
     });
   }
 
+  handleSelect(ranges) {
+    console.log(ranges.selection);
+    this.setState(() => {
+      return { selectionRange: ranges.selection };
+    });
+    // {
+    //   selection: {
+    //     startDate: [native Date Object],
+    //     endDate: [native Date Object],
+    //   }
+    // }
+  }
+
   renderReports() {
     return (
       <div>
@@ -179,7 +198,10 @@ export default class Main extends Component {
               avg Focus
             </div>
           </Col>
-          <Col xs={9}>
+          <Col xs={5} className="Table">
+            <Table />
+          </Col>
+          <Col xs={4} className="calendar">
             <div>
               <Button
                 className="modalButton"
@@ -191,7 +213,10 @@ export default class Main extends Component {
                 Settings
               </Button>
             </div>
-            <Table />
+            <DateRangePicker
+              ranges={[this.state.selectionRange]}
+              onChange={this.handleSelect}
+            />
           </Col>
         </Row>
       </div>
