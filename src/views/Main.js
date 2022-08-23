@@ -31,35 +31,21 @@ export default class Main extends Component {
     this.handleSelect = this.handleSelect.bind(this);
   }
 
-  async componentDidMount() {
-    const userId = localStorage.getItem('userId');
-    if (!userId) window.location.href = '/';
-    const reports = await apiService.getUserReports(userId);
-    let taskTypes = reports.map((a) => a.taskType);
-    let reportHappiness = reports.map((a) => a.happiness);
-    let reportFocus = reports.map((a) => a.focus);
+  async getChartResults(taskTypes, reportHappiness, reportFocus) {
     let duplicateCount = {};
-    let duplicateHappiness = {};
-    let duplicateFocus = {};
     taskTypes.forEach(
       (e) => (duplicateCount[e] = duplicateCount[e] ? duplicateCount[e] + 1 : 1)
     );
-    for (let i = 0; i < taskTypes.length; i++) {
-      duplicateHappiness[taskTypes[i]] = duplicateHappiness[taskTypes[i]]
-        ? duplicateHappiness[taskTypes[i]] + reportHappiness[i]
-        : reportHappiness[i];
-      duplicateFocus[taskTypes[i]] = duplicateFocus[taskTypes[i]]
-        ? duplicateFocus[taskTypes[i]] + reportFocus[i]
-        : reportFocus[i];
-    }
-    for (let i = 0; i < Object.keys(duplicateCount).length; i++) {
-      duplicateHappiness[Object.keys(duplicateCount)[i]] =
-        duplicateHappiness[Object.keys(duplicateCount)[i]] /
-        duplicateCount[Object.keys(duplicateCount)[i]];
-      duplicateFocus[Object.keys(duplicateCount)[i]] =
-        duplicateFocus[Object.keys(duplicateCount)[i]] /
-        duplicateCount[Object.keys(duplicateCount)[i]];
-    }
+    let duplicateHappiness = await this.getAvgHappiness(
+      duplicateCount,
+      taskTypes,
+      reportHappiness
+    );
+    let duplicateFocus = await this.getAvgFocus(
+      duplicateCount,
+      taskTypes,
+      reportFocus
+    );
     let result = Object.keys(duplicateCount).map((e) => {
       return {
         key: e,
@@ -68,10 +54,87 @@ export default class Main extends Component {
         focus: duplicateFocus[e],
       };
     });
+
+    return result;
+  }
+
+  async getAvgHappiness(duplicateCount, taskTypes, reportHappiness) {
+    let duplicateHappiness = {};
+    for (let i = 0; i < taskTypes.length; i++) {
+      duplicateHappiness[taskTypes[i]] = duplicateHappiness[taskTypes[i]]
+        ? duplicateHappiness[taskTypes[i]] + reportHappiness[i]
+        : reportHappiness[i];
+    }
+    for (let i = 0; i < Object.keys(duplicateCount).length; i++) {
+      duplicateHappiness[Object.keys(duplicateCount)[i]] =
+        duplicateHappiness[Object.keys(duplicateCount)[i]] /
+        duplicateCount[Object.keys(duplicateCount)[i]];
+    }
+
+    return duplicateHappiness;
+  }
+
+  async getAvgFocus(duplicateCount, taskTypes, reportFocus) {
+    let duplicateFocus = {};
+    for (let i = 0; i < taskTypes.length; i++) {
+      duplicateFocus[taskTypes[i]] = duplicateFocus[taskTypes[i]]
+        ? duplicateFocus[taskTypes[i]] + reportFocus[i]
+        : reportFocus[i];
+    }
+    for (let i = 0; i < Object.keys(duplicateCount).length; i++) {
+      duplicateFocus[Object.keys(duplicateCount)[i]] =
+        duplicateFocus[Object.keys(duplicateCount)[i]] /
+        duplicateCount[Object.keys(duplicateCount)[i]];
+    }
+
+    return duplicateFocus;
+  }
+
+  async makeChartData(labels, data) {
+    let dataChart = {
+      labels,
+      datasets: [
+        {
+          data,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
+
+    return dataChart;
+  }
+
+  async componentDidMount() {
+    const userId = localStorage.getItem('userId');
+    if (!userId) window.location.href = '/';
+    const reports = await apiService.getUserReports(userId);
+
+    let taskTypes = reports.map((a) => a.taskType);
+    let reportHappiness = reports.map((a) => a.happiness);
+    let reportFocus = reports.map((a) => a.focus);
+    let result = await this.getChartResults(
+      taskTypes,
+      reportHappiness,
+      reportFocus
+    );
     let keys = result.map((a) => a.key);
     let times = result.map((a) => a.count);
     let happiness = result.map((a) => a.happiness);
     let focus = result.map((a) => a.focus);
+
     this.setState(() => {
       return { taskTypesKeys: keys };
     });
@@ -84,72 +147,18 @@ export default class Main extends Component {
     this.setState(() => {
       return { taskTypesFocus: focus };
     });
-    let dataChart = {
-      labels: this.state.taskTypesKeys,
-      datasets: [
-        {
-          data: this.state.taskTypesTimes,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-          ],
-          borderWidth: 1,
-        },
-      ],
-    };
-    let dataChartHappiness = {
-      labels: this.state.taskTypesKeys,
-      datasets: [
-        {
-          data: this.state.taskTypesHappiness,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-          ],
-          borderWidth: 1,
-        },
-      ],
-    };
-    let dataChartFocus = {
-      labels: this.state.taskTypesKeys,
-      datasets: [
-        {
-          data: this.state.taskTypesFocus,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
-            'rgba(255, 206, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(153, 102, 255, 0.2)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-          ],
-          borderWidth: 1,
-        },
-      ],
-    };
+    let dataChart = await this.makeChartData(
+      this.state.taskTypesKeys,
+      this.state.taskTypesTimes
+    );
+    let dataChartHappiness = await this.makeChartData(
+      this.state.taskTypesKeys,
+      this.state.taskTypesHappiness
+    );
+    let dataChartFocus = await this.makeChartData(
+      this.state.taskTypesKeys,
+      this.state.taskTypesFocus
+    );
     this.setState(() => {
       return { stats: dataChart };
     });
@@ -172,12 +181,6 @@ export default class Main extends Component {
     this.setState(() => {
       return { selectionRange: ranges.selection };
     });
-    // {
-    //   selection: {
-    //     startDate: [native Date Object],
-    //     endDate: [native Date Object],
-    //   }
-    // }
   }
 
   renderReports() {
