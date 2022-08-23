@@ -24,6 +24,7 @@ export default class Main extends Component {
       endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
       key: 'selection',
     },
+    updatedKey: Date.now(),
   };
 
   constructor(props) {
@@ -117,10 +118,14 @@ export default class Main extends Component {
     return dataChart;
   }
 
-  async componentDidMount() {
+  async getReports() {
     const userId = localStorage.getItem('userId');
     if (!userId) window.location.href = '/';
-    const reports = await apiService.getUserReports(userId);
+    const reports = await apiService.getUserReportsBetweenTime(
+      userId,
+      this.state.selectionRange.startDate,
+      this.state.selectionRange.endDate
+    );
 
     let taskTypes = reports.map((a) => a.taskType);
     let reportHappiness = reports.map((a) => a.happiness);
@@ -176,11 +181,18 @@ export default class Main extends Component {
     });
   }
 
-  handleSelect(ranges) {
-    console.log(ranges.selection);
-    this.setState(() => {
+  async componentDidMount() {
+    await this.getReports();
+  }
+
+  async handleSelect(ranges) {
+    await this.setState(() => {
       return { selectionRange: ranges.selection };
     });
+    await this.setState(() => {
+      return { updatedKey: Date.now() };
+    });
+    await this.getReports();
   }
 
   renderReports() {
@@ -202,7 +214,10 @@ export default class Main extends Component {
             </div>
           </Col>
           <Col xs={5} className="Table">
-            <Table />
+            <Table
+              key={this.state.updatedKey}
+              props={this.state.selectionRange}
+            />
           </Col>
           <Col xs={4} className="calendar">
             <div>

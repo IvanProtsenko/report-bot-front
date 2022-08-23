@@ -24,9 +24,7 @@ export default class Login extends Component {
 
   async login(event) {
     event.preventDefault();
-    console.log(this.state.id);
     let user = await apiService.getUserById(this.state.id);
-    console.log(user);
     if (user) {
       localStorage.setItem('userId', user.id);
       window.location.href = '/main';

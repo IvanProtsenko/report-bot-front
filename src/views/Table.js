@@ -47,9 +47,14 @@ export default class Table extends Component {
   };
 
   async componentDidMount() {
+    let startDate = this.props.props.startDate;
+    let endDate = this.props.props.endDate;
     const userId = localStorage.getItem('userId');
-    const reports = await apiService.getUserReports(userId);
-    console.log(reports);
+    const reports = await apiService.getUserReportsBetweenTime(
+      userId,
+      startDate,
+      endDate
+    );
     this.changeRowData(reports);
   }
 

@@ -45,6 +45,28 @@ const GET_REPORTS_BY_USER_ID = gql`
   }
 `;
 
+const GET_REPORTS_BY_TIME = gql`
+  query GetReportsByTime(
+    $id: String!
+    $startTime: timestamp
+    $endTime: timestamp
+  ) {
+    Report(
+      where: {
+        ownerId: { _eq: $id }
+        _and: { time: { _lt: $endTime }, _and: { time: { _gt: $startTime } } }
+      }
+    ) {
+      ownerId
+      taskType
+      happiness
+      focus
+      note
+      time
+    }
+  }
+`;
+
 const CREATE_SETTINGS = gql`
   mutation CreateSettings(
     $botActivated: Boolean
@@ -209,7 +231,6 @@ class ApiService {
           id,
         },
       });
-      console.log(result);
       return result.data.Owner_by_pk;
     } catch (err) {
       console.log('ERROR:', err);
@@ -236,6 +257,22 @@ class ApiService {
         query: GET_REPORTS_BY_USER_ID,
         variables: {
           id,
+        },
+      });
+      return result.data.Report;
+    } catch (err) {
+      console.log('ERROR:', err);
+    }
+  };
+
+  getUserReportsBetweenTime = async (id, startTime, endTime) => {
+    try {
+      const result = await this.client.query({
+        query: GET_REPORTS_BY_TIME,
+        variables: {
+          id,
+          startTime,
+          endTime,
         },
       });
       return result.data.Report;
@@ -286,7 +323,6 @@ class ApiService {
           sundayTill: data.sundayTill,
         },
       });
-      console.log(result);
       return result.data.insert_Settings_one;
     } catch (err) {
       console.log('ERROR:', err);
@@ -316,7 +352,6 @@ class ApiService {
           sundayTill: data.sundayTill,
         },
       });
-      console.log(result);
       return result.data.update_Settings;
     } catch (err) {
       console.log('ERROR:', err);

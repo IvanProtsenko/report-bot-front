@@ -48,7 +48,6 @@ export default class Settings extends Component {
   }
 
   async updateValues(settings) {
-    console.log(settings.botActivated);
     this.setState(() => {
       return { botEnabled: settings.botActivated };
     });
@@ -103,7 +102,6 @@ export default class Settings extends Component {
     this.setState(() => {
       return { settings };
     });
-    console.log(settings);
     if (settings.length > 0) {
       await this.updateValues(settings[0]);
     }
@@ -222,12 +220,9 @@ export default class Settings extends Component {
       wednesdayFrom: this.state.wednesdayFrom,
       wednesdayTill: this.state.wednesdayTo,
     };
-    console.log(data);
     if (this.state.settings.length > 0) {
-      console.log('settings exist');
       apiService.updateSettings(data);
     } else {
-      console.log('settings does not exist');
       apiService.createSettings(data);
     }
   }
